@@ -1,9 +1,7 @@
 package db;
 
 import java.io.IOException; //tratamento de exceções
-import java.sql.Connection; //conexão com o banco de dados
-import java.sql.DriverManager; //usado pra fazr a conexão
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Properties; // carrega pares chave-valor de arquivos "[chave]=[valor]"
 import java.io.FileInputStream; //ler
 
@@ -46,6 +44,26 @@ public class DB {
             return props;
         } catch (IOException e){
             throw new DbException(e.getMessage());
+        }
+    }
+
+    public static void closeStatment(Statement st){ //fecha o Statment
+        if(st !=null){
+            try{
+                st.close();
+            }catch (SQLException e){
+                throw new DbException(e.getMessage());
+            }
+        }
+    }
+
+    public static void closeResultSet(ResultSet rs){ //fecha o ResultSet
+        if(rs != null){
+            try{
+                rs.close();
+            }catch (SQLException e){
+                throw new DbException(e.getMessage());
+            }
         }
     }
 }
