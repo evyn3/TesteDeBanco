@@ -3,10 +3,9 @@ package program;
 import db.DB;
 import db.DbException;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 public class Program {
     public static void main(String[] args){
@@ -32,8 +31,52 @@ public class Program {
         finally {
             DB.closeStatment(st);
             DB.closeResultSet(rs);
-            DB.closeConnection();
+            //DB.closeConnection();
 
+        }
+
+        System.out.println("--------------------------------------");
+
+        SimpleDateFormat niversario = new SimpleDateFormat(("dd/MM/yyyy"));//formata a data
+        PreparedStatement ps = null;//para inserir dados no banco
+
+        try{
+            ps = conn.prepareStatement(
+                    "INSERT INTO seller"
+                    + "(Name, Email, BirthDate, BaseSalary, DepartmentId)"
+                    + "VALUES "
+                    + "(?, ?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS //gera primary key
+            );
+
+            ps.setString(1, "Duda");
+            ps.setString(2, "duda@gmail.com");
+            ps.setDate(3, new java.sql.Date(niversario.parse("29/09/2000").getTime()));
+            ps.setDouble(4, 55000.0);
+            ps.setInt(5, 3);
+
+
+            int rowsAffected = ps.executeUpdate(); //para executar
+
+            System.out.println("Finalizando linha alterada " + rowsAffected);
+
+            if(rowsAffected > 0){
+                rs = ps.getGeneratedKeys();
+
+                while(rs.next()){
+                    int id = rs.getInt(1);
+                    System.out.println("Done! id = " + id);
+                }
+            }
+            else{
+                System.out.println("Nenhuma linha foi alterada");
+            }
+
+        }catch (SQLException | ParseException e){
+            e.printStackTrace();
+        } finally {
+            DB.closeStatment(ps);
+            DB.closeConnection();
         }
 
     }
